@@ -1,29 +1,37 @@
 {
-  "name": "apollo-server-sample",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/briete/apollo-server-sample.git",
-  "author": "sato.naoya <sato.naoya@classmethod.jp>",
-  "license": "MIT",
-  "scripts": {
-    "start": "ts-node-dev index.ts"
-  },
-  "dependencies": {
-    "apollo-server": "^2.25.0",
-    "graphql": "^15.5.0",
-    "graphql-tools": "^7.0.5"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.25.0",
-    "@typescript-eslint/parser": "^4.25.0",
-    "eslint": "^7.27.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.23.3",
-    "npm-check-updates": "^11.5.13",
-    "prettier": "^2.3.0",
-    "sort-package-json": "^1.50.0",
-    "ts-node-dev": "^1.1.6",
-    "typescript": "^4.3.2"
-  }
+    "name": "apollo-server-sample",
+    "version": "1.0.0",
+    "main": "index.ts",
+    "repository": "https://github.com/briete/apollo-server-sample.git",
+    "author": "sato.naoya <sato.naoya@classmethod.jp>",
+    "license": "MIT",
+    "scripts": {
+        "start": "ts-node-dev index.ts",
+        "lint": "eslint --cache 'src/**/*.ts' && prettier --check 'src/**/*.ts'",
+        "lint-fix": "eslint --fix 'src/**/*.ts' && prettier --write 'src/**/*.ts'",
+        "codegen": "gql-gen --watch",
+        "upgrade:show": "ncu",
+        "upgrade:do": "ncu -u"
+    },
+    "dependencies": {
+        "apollo-server": "^2.25.0",
+        "graphql": "^15.5.0",
+        "graphql-tools": "^7.0.5"
+    },
+    "devDependencies": {
+        "@graphql-codegen/cli": "^1.21.5",
+        "@graphql-codegen/typescript": "^1.22.1",
+        "@graphql-codegen/typescript-resolvers": "^1.19.2",
+        "@typescript-eslint/eslint-plugin": "^4.25.0",
+        "@typescript-eslint/parser": "^4.25.0",
+        "eslint": "^7.27.0",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-import": "^2.23.3",
+        "npm-check-updates": "^11.5.13",
+        "prettier": "^2.3.0",
+        "sort-package-json": "^1.50.0",
+        "ts-node-dev": "^1.1.6",
+        "typescript": "^4.3.2"
+    }
 }
