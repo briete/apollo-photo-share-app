@@ -13,7 +13,6 @@ import { resolvers } from './src/resolvers/resolver';
 dotenv.config();
 
 const MongoDB = process.env.DB_HOST!;
-console.log(MongoDB);
 
 async function start() {
     const app = express();
