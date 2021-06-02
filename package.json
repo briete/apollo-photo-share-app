@@ -14,14 +14,20 @@
         "upgrade:do": "ncu -u"
     },
     "dependencies": {
-        "apollo-server": "^2.25.0",
+        "apollo-server-express": "^2.25.0",
+        "dotenv": "^10.0.0",
+        "express": "^4.17.1",
         "graphql": "^15.5.0",
-        "graphql-tools": "^7.0.5"
+        "graphql-playground-middleware-express": "^1.7.22",
+        "graphql-tools": "^7.0.5",
+        "mongodb": "^3.6.9"
     },
     "devDependencies": {
         "@graphql-codegen/cli": "^1.21.5",
         "@graphql-codegen/typescript": "^1.22.1",
         "@graphql-codegen/typescript-resolvers": "^1.19.2",
+        "@types/express": "^4.17.12",
+        "@types/mongodb": "^3.6.17",
         "@typescript-eslint/eslint-plugin": "^4.25.0",
         "@typescript-eslint/parser": "^4.25.0",
         "eslint": "^7.27.0",

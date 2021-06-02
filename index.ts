@@ -1,4 +1,8 @@
-import { ApolloServer } from 'apollo-server';
+import { MongoClient } from 'mongodb';
+import * as dotenv from 'dotenv';
+import expressPlayGround from 'graphql-playground-middleware-express';
+import { ApolloServer } from 'apollo-server-express';
+import express from 'express';
 import {
     loadSchema,
     GraphQLFileLoader,
@@ -6,15 +10,38 @@ import {
 } from 'graphql-tools';
 import { resolvers } from './src/resolvers/resolver';
 
-(async () => {
+dotenv.config();
+
+const MongoDB = process.env.DB_HOST!;
+console.log(MongoDB);
+
+async function start() {
+    const app = express();
+    const client = await MongoClient.connect(MongoDB, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
+    const db = client.db();
+    const context = { db };
+
     const schema = await loadSchema('schema.graphql', {
         loaders: [new GraphQLFileLoader()],
     });
 
     const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
 
-    const server = new ApolloServer({ schema: schemaWithResolvers });
-    server
-        .listen()
-        .then(({ url }) => console.info(`GraphQL Service running on ${url}`));
-})();
+    const server = new ApolloServer({ schema: schemaWithResolvers, context });
+
+    server.applyMiddleware({ app });
+
+    app.get('/', (req, res) => res.end(`Welcome to the PhotoShare API`));
+    app.get('/playground', expressPlayGround({ endpoint: '/graphql' }));
+
+    app.listen({ port: 4000 }, () => {
+        console.log(
+            `GraphQL Server running @ http://localhost:4000${server.graphqlPath}`,
+        );
+    });
+}
+
+start().catch((e) => console.error(e));

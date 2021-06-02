@@ -1,27 +1,27 @@
-import { Resolvers, Photo } from '../types/generate';
+import { Resolvers, Photo, User, PhotoCategory } from '../types/generate';
+import { GraphQLScalarType } from 'graphql';
+import { Db } from 'mongodb';
 
-const photos: Array<Photo> = [];
-let id = 0;
-
-export const resolvers: Resolvers = {
+export const resolvers: Resolvers<{ db: Db }> = {
     Query: {
-        totalPhotos: (): number => photos.length,
-        allPhotos: (): Array<Photo> => photos,
+        totalPhotos: async (parent, args, { db }): Promise<number> =>
+            await db.collection('photos').estimatedDocumentCount(),
+        allPhotos: async (parent, args, { db }): Promise<Array<Photo>> =>
+            await db.collection('photos').find().toArray(),
+        totalUsers: async (parent, args, { db }): Promise<number> =>
+            await db.collection('users').estimatedDocumentCount(),
+        allUsers: async (parent, args, { db }): Promise<Array<User>> =>
+            await db.collection('users').find().toArray(),
     },
-    Mutation: {
-        postPhoto: (parent, args): Photo => {
-            const newPhoto: Photo = {
-                id: (id++).toString(),
-                ...args.input,
-                url: '',
-            };
-
-            photos.push(newPhoto);
-
-            return newPhoto;
-        },
-    },
+    Mutation: {},
     Photo: {
         url: (parent) => `http://youtesite.com/img/${parent.id}.jpg`,
     },
+    DateTime: new GraphQLScalarType({
+        name: 'DateTime',
+        description: 'A valid date time value.',
+        parseValue: (value) => new Date(value),
+        serialize: (value) => new Date(value).toISOString(),
+        parseLiteral: (ast) => ast.kind,
+    }),
 };
