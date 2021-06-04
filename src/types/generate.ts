@@ -40,11 +40,12 @@ export type MutationGithubAuthArgs = {
 export type Photo = {
   __typename?: 'Photo';
   id: Scalars['ID'];
-  url: Scalars['String'];
+  url?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   category?: Maybe<PhotoCategory>;
-  postedBy: User;
+  userID?: Maybe<Scalars['String']>;
+  postedBy?: Maybe<User>;
   created: Scalars['DateTime'];
 };
 
@@ -64,6 +65,7 @@ export type PostPhotoInput = {
 
 export type Query = {
   __typename?: 'Query';
+  me?: Maybe<User>;
   totalPhotos?: Maybe<Scalars['Int']>;
   allPhotos: Array<Photo>;
   totalUsers: Scalars['Int'];
@@ -209,16 +211,18 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type PhotoResolvers<ContextType = any, ParentType extends ResolversParentTypes['Photo'] = ResolversParentTypes['Photo']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   category?: Resolver<Maybe<ResolversTypes['PhotoCategory']>, ParentType, ContextType>;
-  postedBy?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  userID?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  postedBy?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   created?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   totalPhotos?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   allPhotos?: Resolver<Array<ResolversTypes['Photo']>, ParentType, ContextType, RequireFields<QueryAllPhotosArgs, never>>;
   totalUsers?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;

@@ -1,8 +1,8 @@
 {
-    "name": "apollo-server-sample",
-    "version": "1.0.0",
+    "name": "photo-share-saas-sample",
+    "version": "0.0.0",
     "main": "index.ts",
-    "repository": "https://github.com/briete/apollo-server-sample.git",
+    "repository": "https://github.com/briete/photo-share-saas-sample.git",
     "author": "sato.naoya <sato.naoya@classmethod.jp>",
     "license": "MIT",
     "scripts": {

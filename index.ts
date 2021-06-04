@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { Db, MongoClient } from 'mongodb';
 import * as dotenv from 'dotenv';
 import expressPlayGround from 'graphql-playground-middleware-express';
 import { ApolloServer } from 'apollo-server-express';
@@ -9,6 +9,7 @@ import {
     addResolversToSchema,
 } from 'graphql-tools';
 import { resolvers } from './src/resolvers/resolver';
+import { User } from './src/types/generate';
 
 dotenv.config();
 
@@ -21,7 +22,6 @@ async function start() {
         useUnifiedTopology: true,
     });
     const db = client.db();
-    const context = { db };
 
     const schema = await loadSchema('schema.graphql', {
         loaders: [new GraphQLFileLoader()],
@@ -29,7 +29,16 @@ async function start() {
 
     const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
 
-    const server = new ApolloServer({ schema: schemaWithResolvers, context });
+    const server = new ApolloServer({
+        schema: schemaWithResolvers,
+        context: async ({ req }): Promise<{ currentUser: User; db: Db }> => {
+            const githubToken = req.headers.authorization;
+            const currentUser = await db
+                .collection('users')
+                .findOne({ githubToken });
+            return { currentUser, db };
+        },
+    });
 
     server.applyMiddleware({ app });
 
