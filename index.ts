@@ -1,4 +1,3 @@
-import { Db, MongoClient } from 'mongodb';
 import * as dotenv from 'dotenv';
 import expressPlayGround from 'graphql-playground-middleware-express';
 import { ApolloServer } from 'apollo-server-express';
@@ -8,20 +7,31 @@ import {
     GraphQLFileLoader,
     addResolversToSchema,
 } from 'graphql-tools';
+import { Database } from './src/infrastructures/database/posgresql';
 import { resolvers } from './src/resolvers/resolver';
 import { User } from './src/types/generate';
 
 dotenv.config();
 
-const MongoDB = process.env.DB_HOST!;
+const DB_HOST = process.env.DB_HOST!;
+const DB_DATABASE = process.env.DB_DATABASE!;
+const DB_USER = process.env.DB_USER!;
+const DB_PASSWORD = process.env.DB_PASSWORD!;
+
+const knexConfig = {
+    client: 'pg',
+    connection: {
+        host: DB_HOST,
+        user: DB_USER,
+        password: DB_PASSWORD,
+        database: DB_DATABASE,
+    },
+};
 
 async function start() {
     const app = express();
-    const client = await MongoClient.connect(MongoDB, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
-    const db = client.db();
+
+    const db = new Database(knexConfig);
 
     const schema = await loadSchema('schema.graphql', {
         loaders: [new GraphQLFileLoader()],
@@ -31,11 +41,12 @@ async function start() {
 
     const server = new ApolloServer({
         schema: schemaWithResolvers,
-        context: async ({ req }): Promise<{ currentUser: User; db: Db }> => {
+        dataSources: () => ({ db }),
+        context: async ({
+            req,
+        }): Promise<{ currentUser: User; db: Database }> => {
             const githubToken = req.headers.authorization;
-            const currentUser = await db
-                .collection('users')
-                .findOne({ githubToken });
+            const currentUser = await db.getUser(githubToken!);
             return { currentUser, db };
         },
     });

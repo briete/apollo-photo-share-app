@@ -19,6 +19,7 @@ type AuthPayload {
 }
 
 type User {
+    userId: ID!
     githubLogin: ID!
     githubToken: String!
     name: String
@@ -27,14 +28,13 @@ type User {
 }
 
 type Photo {
-    id: ID!
+    photoId: ID!
     url: String
     name: String!
     description: String
     category: PhotoCategory
-    userID: String
+    userId: String
     postedBy: User
-    created: DateTime!
 }
 
 enum PhotoCategory {

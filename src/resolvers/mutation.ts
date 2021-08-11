@@ -1,10 +1,14 @@
-import { authorizeGitHub } from '../lib/github-helper';
+import * as uuid from 'uuid';
+import { authorizeGitHub } from '../helpers/github-helper';
 import { MutationResolvers, Photo, User } from '../types/generate';
 import { ContextType } from './resolver';
 
 const ClientId = process.env.CLIENT_ID!;
 const ClientSecret = process.env.CLIENT_SECRET!;
 
+/**
+ * GitHub認可を行いユーザーを作成する
+ */
 const githubAuth: MutationResolvers<ContextType>['githubAuth'] = async (
     parent,
     args,
@@ -18,12 +22,13 @@ const githubAuth: MutationResolvers<ContextType>['githubAuth'] = async (
                 code: args.code,
             });
 
-        // messageがある場合は、なんらかのエラーが発生している
+        // messageがある場合は、なんらかのエラーが発生しているためエラーとする
         if (message) {
             throw new Error(message);
         }
 
-        const latestUserInfo: User = {
+        const userInfo: User = {
+            userId: uuid.v4(),
             name,
             githubLogin: login,
             githubToken: access_token,
@@ -31,21 +36,19 @@ const githubAuth: MutationResolvers<ContextType>['githubAuth'] = async (
             postedPhotos: [],
         };
 
-        const {
-            ops: [user],
-        } = await db
-            .collection<User>('users')
-            .replaceOne({ githubLogin: login }, latestUserInfo, {
-                upsert: true,
-            });
+        // ユーザーを作成
+        await db.insertUser(userInfo);
 
-        return { user, token: access_token };
+        return { user: userInfo, token: access_token };
     } catch (e) {
         console.error(e);
         throw new Error(e);
     }
 };
 
+/**
+ * 写真を投稿する
+ */
 const postPhoto: MutationResolvers<ContextType>['postPhoto'] = async (
     parent,
     args,
@@ -55,13 +58,14 @@ const postPhoto: MutationResolvers<ContextType>['postPhoto'] = async (
         throw new Error('only an authorized user can post a photo');
     }
 
-    const newPhoto: Omit<Photo, 'id'> = {
+    const newPhoto: Photo = {
+        photoId: uuid.v4(),
         ...args.input,
-        userID: currentUser.githubLogin,
-        created: new Date(),
+        userId: currentUser.userId,
     };
 
-    const { insertedId } = await db.collection('photos').insertOne(newPhoto);
+    const { insertedId } = await db.insertPhoto(newPhoto);
+
     return { ...newPhoto, id: insertedId };
 };
 
